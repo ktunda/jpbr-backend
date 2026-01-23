@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  role      String   @default("CLIENT")
+  createdAt DateTime @default(now())
+  
+  purchases Purchase[]
+  packages  Package[]
+}
+
+model Purchase {
+  id               String   @id @default(uuid())
+  userId           String
+  storeName        String
+  declaredValueJpy Float
+  status           String   @default("CADASTRADO")
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  packageItems PackageItem[]
+
+}
+
+model StatusHistory {
+  id         String   @id @default(uuid())
+  entityType String
+  entityId   String
+  fromStatus String?
+  toStatus   String
+  createdAt  DateTime @default(now())
+}
+
+model Package {
+  id        String   @id @default(uuid())
+  userId    String
+  status    String   @default("ABERTO")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  items PackageItem[]
+
+}
+
+model PackageItem {
+  id         String   @id @default(uuid())
+  packageId  String
+  purchaseId String
+  createdAt  DateTime @default(now())
+
+  package Package  @relation(fields: [packageId], references: [id])
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
+}
