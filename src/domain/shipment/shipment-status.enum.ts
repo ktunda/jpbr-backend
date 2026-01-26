@@ -1,0 +1,8 @@
+export enum ShipmentStatus {
+  CRIADO = 'CRIADO',
+  COLETADO = 'COLETADO',
+  EM_TRANSITO = 'EM_TRANSITO',
+  EM_EXCECAO = 'EM_EXCECAO',
+  ENTREGUE = 'ENTREGUE',
+  CANCELADO = 'CANCELADO',
+}
