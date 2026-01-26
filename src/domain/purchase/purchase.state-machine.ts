@@ -63,3 +63,22 @@ export const PURCHASE_STATE_TRANSITIONS: PurchaseStateTransition[] = [
     allowedActors: ['CLIENT', 'ADMIN'],
   },
 ];
+
+/**
+ * Verifica se uma transição de status é permitida
+ */
+export function canTransition(
+  from: PurchaseStatus,
+  to: PurchaseStatus,
+  actor: PurchaseActor,
+): boolean {
+  const transition = PURCHASE_STATE_TRANSITIONS.find(
+    (t) => t.from === from && t.to === to,
+  );
+
+  if (!transition) {
+    return false;
+  }
+
+  return transition.allowedActors.includes(actor);
+}
