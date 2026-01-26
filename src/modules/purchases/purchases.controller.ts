@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 import { PurchasesService } from './purchases.service';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
+import { UpdatePurchaseStatusDto } from './dto/update-purchase-status.dto';
 
 @Controller('purchases')
 export class PurchasesController {
@@ -19,4 +20,20 @@ export class PurchasesController {
 
     return purchase;
   }
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() body: UpdatePurchaseStatusDto,
+  ) {
+    const { toStatus, actor } = body;
+
+    const updatedPurchase = await this.purchasesService.transitionStatus(
+      id,
+      toStatus,
+      actor,
+    );
+
+    return updatedPurchase;
+  }
+
 }
