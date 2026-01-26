@@ -1,6 +1,6 @@
 import { IsEnum } from 'class-validator';
 import { PurchaseStatus } from '../../../domain/purchase/purchase-status.enum';
-import { PurchaseActor } from '../../../domain/purchase/purchase.state-machine';
+import type { PurchaseActor } from '../../../domain/purchase/purchase.state-machine';
 
 export class UpdatePurchaseStatusDto {
   @IsEnum(PurchaseStatus)
