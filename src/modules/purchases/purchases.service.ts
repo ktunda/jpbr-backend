@@ -14,6 +14,47 @@ export class PurchasesService {
     private readonly statusHistoryService: StatusHistoryService,
   ) {}
 
+async create(params: {
+    userId: string;
+    storeName: string;
+    declaredValueJpy: number;
+    productUrl?: string;
+    productTitle?: string;
+    jpTrackingCode?: string;
+  }) {
+    const {
+      userId,
+      storeName,
+      declaredValueJpy,
+      productUrl,
+      productTitle,
+      jpTrackingCode,
+    } = params;
+
+    // 1. Criar purchase com status inicial
+    const purchase = await this.prisma.client.purchase.create({
+      data: {
+        userId,
+        storeName,
+        declaredValueJpy,
+        productUrl,
+        productTitle,
+        jpTrackingCode,
+        status: PurchaseStatus.CADASTRADO,
+      },
+    });
+
+    // 2. Registrar auditoria de criação
+    await this.statusHistoryService.record({
+      entityType: 'PURCHASE',
+      entityId: purchase.id,
+      fromStatus: null,
+      toStatus: PurchaseStatus.CADASTRADO,
+    });
+
+    return purchase;
+  }
+
   async transitionStatus(
     purchaseId: string,
     toStatus: PurchaseStatus,

@@ -1,8 +1,14 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsUUID } from 'class-validator';
 
 export class CreatePurchaseDto {
+  @IsUUID()
+  userId: string;
+
   @IsString()
   storeName: string;
+
+  @IsNumber()
+  declaredValueJpy: number;
 
   @IsOptional()
   @IsString()
@@ -12,9 +18,7 @@ export class CreatePurchaseDto {
   @IsString()
   productTitle?: string;
 
-  @IsNumber()
-  declaredValueJpy: number;
-
+  @IsOptional()
   @IsString()
-  jpTrackingCode: string;
+  jpTrackingCode?: string;
 }

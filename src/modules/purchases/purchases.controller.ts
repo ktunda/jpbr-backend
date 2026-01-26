@@ -1,8 +1,11 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
+import { PurchasesService } from './purchases.service';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 
 @Controller('purchases')
 export class PurchasesController {
+  constructor(private readonly purchasesService: PurchasesService) {}
+
   @Get()
   list() {
     return {
@@ -11,10 +14,9 @@ export class PurchasesController {
   }
 
   @Post()
-  create(@Body() body: CreatePurchaseDto) {
-    return {
-      message: 'purchase received',
-      data: body,
-    };
+  async create(@Body() body: CreatePurchaseDto) {
+    const purchase = await this.purchasesService.create(body);
+
+    return purchase;
   }
 }
