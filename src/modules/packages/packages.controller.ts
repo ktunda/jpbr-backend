@@ -3,6 +3,7 @@ import { PackagesService } from './packages.service';
 import { PackageChoiceDto } from './dto/package-choice.dto';
 import { CreatePackageDto } from './dto/create-package.dto';
 import type { PackageActor } from '../../domain/package/package.state-machine';
+import { AdvancePackageStatusDto } from './dto/advance-package-status.dto';
 
 @Controller('packages')
 export class PackagesController {
@@ -42,4 +43,22 @@ export class PackagesController {
       actor,
     });
   }
+
+
+  /**
+   * Avançar status do package (uso interno / sistema)
+   */
+  @Post(':id/advance')
+  async advanceStatus(
+    @Param('id') packageId: string,
+    @Body() body: AdvancePackageStatusDto,
+  ) {
+    return this.packagesService.advanceStatus({
+      packageId,
+      toStatus: body.toStatus,
+    });
+  }
+
+
 }
+

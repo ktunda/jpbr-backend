@@ -20,7 +20,6 @@ export class PackagesService {
   async create(params: { userId: string }) {
     const { userId } = params;
 
-    // 1. Criar package
     const pkg = await this.prisma.client.package.create({
       data: {
         userId,
@@ -28,7 +27,6 @@ export class PackagesService {
       },
     });
 
-    // 2. Registrar auditoria
     await this.statusHistoryService.record({
       entityType: 'PACKAGE',
       entityId: pkg.id,
@@ -36,6 +34,53 @@ export class PackagesService {
     });
 
     return pkg;
+  }
+
+  /**
+   * Avanço de status pelo SYSTEM
+   */
+  async advanceStatus(params: {
+    packageId: string;
+    toStatus: PackageStatus;
+  }) {
+    const { packageId, toStatus } = params;
+
+    const pkg = await this.prisma.client.package.findUnique({
+      where: { id: packageId },
+    });
+
+    if (!pkg) {
+      throw new Error('Package não encontrado');
+    }
+
+    const fromStatus = pkg.status as PackageStatus;
+
+    const transitionAllowed = PACKAGE_STATE_TRANSITIONS.some(
+      (t) =>
+        t.from === fromStatus &&
+        t.to === toStatus &&
+        t.allowedActors.includes('SYSTEM'),
+    );
+
+    if (!transitionAllowed) {
+      throw new Error(
+        `Transição inválida: ${fromStatus} → ${toStatus} por SYSTEM`,
+      );
+    }
+
+    const updatedPackage = await this.prisma.client.package.update({
+      where: { id: packageId },
+      data: { status: toStatus },
+    });
+
+    await this.statusHistoryService.record({
+      entityType: 'PACKAGE',
+      entityId: packageId,
+      fromStatus,
+      toStatus,
+    });
+
+    return updatedPackage;
   }
 
   /**
@@ -48,7 +93,6 @@ export class PackagesService {
   }) {
     const { packageId, choice, actor } = params;
 
-    // 1. Buscar o package
     const pkg = await this.prisma.client.package.findUnique({
       where: { id: packageId },
     });
@@ -59,20 +103,17 @@ export class PackagesService {
 
     const fromStatus = pkg.status as PackageStatus;
 
-    // 2. Validar status atual
     if (fromStatus !== PackageStatus.AGUARDANDO_ESCOLHA_CLIENTE) {
       throw new Error(
         `Package não está aguardando escolha do cliente (status atual: ${fromStatus})`,
       );
     }
 
-    // 3. Resolver status destino
     const toStatus =
       choice === 'CONSOLIDATE'
         ? PackageStatus.CONSOLIDANDO
         : PackageStatus.PRONTO_PARA_PRECIFICAR;
 
-    // 4. Validar transição via domínio
     const transitionAllowed = PACKAGE_STATE_TRANSITIONS.some(
       (t) =>
         t.from === fromStatus &&
@@ -86,13 +127,11 @@ export class PackagesService {
       );
     }
 
-    // 5. Atualizar status
     const updatedPackage = await this.prisma.client.package.update({
       where: { id: packageId },
       data: { status: toStatus },
     });
 
-    // 6. Registrar auditoria
     await this.statusHistoryService.record({
       entityType: 'PACKAGE',
       entityId: packageId,
