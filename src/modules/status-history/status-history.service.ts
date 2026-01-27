@@ -11,14 +11,24 @@ export class StatusHistoryService {
     fromStatus?: string;
     toStatus: string;
   }) {
-    const { entityType, entityId, fromStatus, toStatus } = params;
-
     return this.prisma.client.statusHistory.create({
-      data: {
+      data: params,
+    });
+  }
+
+  async list(params: {
+    entityType: string;
+    entityId: string;
+  }) {
+    const { entityType, entityId } = params;
+
+    return this.prisma.client.statusHistory.findMany({
+      where: {
         entityType,
         entityId,
-        fromStatus,
-        toStatus,
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
   }
