@@ -16,6 +16,11 @@ export class PackagesController {
     };
   }
 
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    return this.packagesService.findById(id);
+  }
+
   /**
    * Criação do Package
    */

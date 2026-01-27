@@ -37,6 +37,22 @@ export class PackagesService {
   }
 
   /**
+   * Buscar Package por ID
+   */
+  async findById(packageId: string) {
+    const pkg = await this.prisma.client.package.findUnique({
+      where: { id: packageId },
+    });
+
+    if (!pkg) {
+      throw new Error('Package não encontrado');
+    }
+
+    return pkg;
+  }
+
+
+  /**
    * Avanço de status pelo SYSTEM
    */
   async advanceStatus(params: {
