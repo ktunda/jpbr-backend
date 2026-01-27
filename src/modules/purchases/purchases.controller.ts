@@ -12,6 +12,10 @@ export class PurchasesController {
     return this.purchasesService.list();
   }
 
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    return this.purchasesService.findById(id);
+  }
 
   @Post()
   async create(@Body() body: CreatePurchaseDto) {

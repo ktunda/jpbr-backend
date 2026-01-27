@@ -22,6 +22,18 @@ export class PurchasesService {
     });
   }
 
+  async findById(purchaseId: string) {
+    const purchase = await this.prisma.client.purchase.findUnique({
+      where: { id: purchaseId },
+    });
+
+    if (!purchase) {
+      throw new Error('Purchase não encontrada');
+    }
+
+    return purchase;
+  }
+
   async create(params: {
     userId: string;
     storeName: string;
