@@ -8,11 +8,10 @@ export class PurchasesController {
   constructor(private readonly purchasesService: PurchasesService) {}
 
   @Get()
-  list() {
-    return {
-      message: 'purchases endpoint ok',
-    };
+  async list() {
+    return this.purchasesService.list();
   }
+
 
   @Post()
   async create(@Body() body: CreatePurchaseDto) {

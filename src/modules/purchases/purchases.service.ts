@@ -14,6 +14,14 @@ export class PurchasesService {
     private readonly statusHistoryService: StatusHistoryService,
   ) {}
 
+  async list() {
+    return this.prisma.client.purchase.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async create(params: {
     userId: string;
     storeName: string;
