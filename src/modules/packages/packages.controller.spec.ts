@@ -1,12 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PackagesController } from './packages.controller';
+import { PackagesService } from './packages.service';
 
 describe('PackagesController', () => {
   let controller: PackagesController;
 
+  const packagesServiceMock = {
+    chooseConsolidation: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PackagesController],
+      providers: [
+        {
+          provide: PackagesService,
+          useValue: packagesServiceMock,
+        },
+      ],
     }).compile();
 
     controller = module.get<PackagesController>(PackagesController);

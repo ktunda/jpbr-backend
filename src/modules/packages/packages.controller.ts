@@ -1,7 +1,12 @@
 import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { PackagesService } from './packages.service';
+import { PackageChoiceDto } from './dto/package-choice.dto';
+import type { PackageActor } from '../../domain/package/package.state-machine';
 
 @Controller('packages')
 export class PackagesController {
+  constructor(private readonly packagesService: PackagesService) {}
+
   @Get()
   list() {
     return {
@@ -10,14 +15,19 @@ export class PackagesController {
   }
 
   @Post(':id/choice')
-  choose(
+  async choose(
     @Param('id') packageId: string,
-    @Body() body: { option: string },
+    @Body() body: PackageChoiceDto,
   ) {
-    return {
-      message: 'package choice received',
+    // Por enquanto, o ator vem fixo (CLIENT)
+    const actor: PackageActor = 'CLIENT';
+
+    const updatedPackage = await this.packagesService.chooseConsolidation({
       packageId,
       choice: body.option,
-    };
+      actor,
+    });
+
+    return updatedPackage;
   }
 }
