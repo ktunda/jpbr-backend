@@ -30,7 +30,7 @@ export const PURCHASE_STATE_TRANSITIONS: PurchaseStateTransition[] = [
   {
     from: PurchaseStatus.CADASTRADO,
     to: PurchaseStatus.RECEBIDO_NO_JAPAO,
-    allowedActors: ['ADMIN', 'OPERATOR'],
+    allowedActors: ['ADMIN', 'OPERATOR', 'SYSTEM'],
   },
   {
     from: PurchaseStatus.EM_TRANSITO_JP,
