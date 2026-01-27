@@ -1,12 +1,20 @@
 import { Module } from '@nestjs/common';
 import { PackagesController } from './packages.controller';
 import { PackagesService } from './packages.service';
+import { PackageItemsService } from './package-items.service';
+import { PackageItemsController } from './package-items.controller';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { StatusHistoryModule } from '../status-history/status-history.module';
 
 @Module({
   imports: [PrismaModule, StatusHistoryModule],
-  controllers: [PackagesController],
-  providers: [PackagesService],
+  controllers: [
+    PackagesController,
+    PackageItemsController,
+  ],
+  providers: [
+    PackagesService,
+    PackageItemsService,
+  ],
 })
 export class PackagesModule {}
