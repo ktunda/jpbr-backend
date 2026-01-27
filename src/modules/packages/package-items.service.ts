@@ -47,11 +47,14 @@ export class PackageItemsService {
     }
 
     if (
-      ![
-        PurchaseStatus.CADASTRADO,
-        PurchaseStatus.EM_TRANSITO_JP,
-      ].includes(purchase.status as PurchaseStatus)
-    ) {
+       ![
+         PurchaseStatus.CADASTRADO,
+         PurchaseStatus.EM_TRANSITO_JP,
+         PurchaseStatus.RECEBIDO_NO_JAPAO,
+         PurchaseStatus.EM_INSPECAO,
+         PurchaseStatus.AGUARDANDO_CONSOLIDACAO,
+        ].includes(purchase.status as PurchaseStatus)
+      ) {
       throw new Error(
         `Purchase em status inválido para vinculação: ${purchase.status}`,
       );
