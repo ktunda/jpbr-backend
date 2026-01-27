@@ -14,6 +14,33 @@ export class PackagesService {
     private readonly statusHistoryService: StatusHistoryService,
   ) {}
 
+  /**
+   * Criação do Package (status inicial: ABERTO)
+   */
+  async create(params: { userId: string }) {
+    const { userId } = params;
+
+    // 1. Criar package
+    const pkg = await this.prisma.client.package.create({
+      data: {
+        userId,
+        status: PackageStatus.ABERTO,
+      },
+    });
+
+    // 2. Registrar auditoria
+    await this.statusHistoryService.record({
+      entityType: 'PACKAGE',
+      entityId: pkg.id,
+      toStatus: PackageStatus.ABERTO,
+    });
+
+    return pkg;
+  }
+
+  /**
+   * Escolha do cliente: consolidar ou não
+   */
   async chooseConsolidation(params: {
     packageId: string;
     choice: 'CONSOLIDATE' | 'DO_NOT_CONSOLIDATE';
@@ -59,7 +86,7 @@ export class PackagesService {
       );
     }
 
-    // 5. Atualizar status do package
+    // 5. Atualizar status
     const updatedPackage = await this.prisma.client.package.update({
       where: { id: packageId },
       data: { status: toStatus },
