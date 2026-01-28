@@ -12,19 +12,21 @@ export function calculatePrice(
     0,
   );
 
-  // 2. Câmbio provisório (fixo)
-  const fxRateApplied = 1;
+  // 2. Câmbio efetivo (com spread)
+  const fxRateBase = input.fx?.rateJpyBrl ?? 1;
+  const fxSpread = input.fx?.spreadPercent ?? 0;
+  const fxRateApplied = fxRateBase * (1 + fxSpread);
 
-  // 3. Converter para BRL (por enquanto igual)
+  // 3. Converter para BRL
   const baseAmount = totalDeclaredJpy * fxRateApplied;
 
   // 3.1 Frete fixo provisório
   const freightAmount = 300;
 
   // 3.2 Parâmetros do Imposto de Importação (II)
-  const usdExchangeRate = 150; // 1 USD = 150 JPY (provisório)
+  const usdExchangeRate = 150; // provisório
   const importTaxThresholdUsd = 50;
-  const importTaxRate = 0.6; // 60%
+  const importTaxRate = 0.6;
 
   // 3.3 Converter valor declarado para USD
   const totalDeclaredUsd = totalDeclaredJpy / usdExchangeRate;
@@ -35,7 +37,6 @@ export function calculatePrice(
       ? totalDeclaredUsd * importTaxRate * fxRateApplied
       : 0;
 
-  // 4. Retornar estrutura completa (demais valores zerados)
   return {
     freightAmount,
     importTaxAmount,
