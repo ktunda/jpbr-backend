@@ -91,4 +91,16 @@ export class QuotesService {
     return quote;
 
   }
+
+  async listByPackage(packageId: string) {
+    return this.prisma.client.quote.findMany({
+      where: {
+        packageId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  }
+
 }

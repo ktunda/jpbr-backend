@@ -1,4 +1,4 @@
-import { Controller, Post, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
 
 @Controller('packages')
@@ -17,4 +17,12 @@ export class QuotesController {
       destinationState: body.destinationState,
     });
   }
+
+  @Get(':id/quotes')
+  async listQuotes(
+    @Param('id') packageId: string,
+  ) {
+    return this.quotesService.listByPackage(packageId);
+  }
+
 }
