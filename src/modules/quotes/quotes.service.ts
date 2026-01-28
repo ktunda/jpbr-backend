@@ -54,6 +54,17 @@ export class QuotesService {
       destinationState: params.destinationState,
     });
 
+    // 5.2 Expirar quotes ativos anteriores (boa prática)
+    await this.prisma.client.quote.updateMany({
+      where: {
+        packageId: packageId,
+        status: 'ATIVO',
+      },
+      data: {
+        status: 'EXPIRADO',
+      },
+    });
+
     // 6. Criar Quote (valores dummy, sem cálculo)
     const quote = await this.prisma.client.quote.create({
       data: {
