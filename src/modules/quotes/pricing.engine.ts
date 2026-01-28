@@ -42,17 +42,23 @@ export function calculatePrice(
   const icmsBase = declaredValueBrl + freightAmount + importTaxAmount;
   const icmsAmount = icmsBase * icmsRate;
 
+  // 3.4 Buffer de risco (5%)
+  const riskBufferRate = 0.05;
+  const riskBase = freightAmount + importTaxAmount + icmsAmount;
+  const riskBufferAmount = riskBase * riskBufferRate;
+
   return {
     freightAmount,
     importTaxAmount,
     icmsAmount,
     adminFeeAmount: 0,
-    riskBufferAmount: 0,
+    riskBufferAmount,
     totalAmount:
       declaredValueBrl +
       freightAmount +
       importTaxAmount +
-      icmsAmount,
+      icmsAmount +
+      riskBufferAmount,
     fxRateApplied,
   };
 }
