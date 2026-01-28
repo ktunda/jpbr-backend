@@ -64,6 +64,13 @@ export class PackagesController {
     });
   }
 
+  /**
+   * Finalizar consolidação do package
+   */
+  @Post(':id/finish-consolidation')
+  async finishConsolidation(@Param('id') packageId: string) {
+    return this.packagesService.finishConsolidation(packageId);
+  }
 
 }
 

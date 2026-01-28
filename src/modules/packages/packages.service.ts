@@ -157,4 +157,51 @@ export class PackagesService {
 
     return updatedPackage;
   }
+
+/**
+ * Finalizar consolidação do Package
+ * Regra de negócio: só após itens vinculados
+ */
+async finishConsolidation(packageId: string) {
+  // 1. Buscar package
+  const pkg = await this.prisma.client.package.findUnique({
+    where: { id: packageId },
+    include: { items: true },
+  });
+
+  if (!pkg) {
+    throw new Error('Package não encontrado');
+  }
+
+  // 2. Validar status atual
+  if (pkg.status !== PackageStatus.CONSOLIDANDO) {
+    throw new Error(
+      `Package não está em CONSOLIDANDO (status atual: ${pkg.status})`,
+    );
+  }
+
+  // 3. Validar se possui itens
+  if (!pkg.items || pkg.items.length === 0) {
+    throw new Error('Package não possui purchases vinculadas');
+  }
+
+  // 4. Atualizar status do package
+  const updatedPackage = await this.prisma.client.package.update({
+    where: { id: packageId },
+    data: {
+      status: PackageStatus.PRONTO_PARA_PRECIFICAR,
+    },
+  });
+
+  // 5. Auditoria
+  await this.statusHistoryService.record({
+    entityType: 'PACKAGE',
+    entityId: packageId,
+    fromStatus: PackageStatus.CONSOLIDANDO,
+    toStatus: PackageStatus.PRONTO_PARA_PRECIFICAR,
+  });
+
+  return updatedPackage;
+}
+
 }
