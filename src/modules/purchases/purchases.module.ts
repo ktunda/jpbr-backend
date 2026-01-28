@@ -8,5 +8,6 @@ import { StatusHistoryModule } from '../status-history/status-history.module';
   imports: [PrismaModule, StatusHistoryModule],
   controllers: [PurchasesController],
   providers: [PurchasesService],
+  exports: [PurchasesService],
 })
 export class PurchasesModule {}

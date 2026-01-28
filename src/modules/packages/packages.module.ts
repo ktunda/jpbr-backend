@@ -5,9 +5,10 @@ import { PackageItemsService } from './package-items.service';
 import { PackageItemsController } from './package-items.controller';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { StatusHistoryModule } from '../status-history/status-history.module';
+import { PurchasesModule } from '../purchases/purchases.module';
 
 @Module({
-  imports: [PrismaModule, StatusHistoryModule],
+  imports: [PrismaModule, StatusHistoryModule, PurchasesModule],
   controllers: [
     PackagesController,
     PackageItemsController,

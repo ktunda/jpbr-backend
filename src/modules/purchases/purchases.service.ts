@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   canTransition,
@@ -79,6 +79,11 @@ export class PurchasesService {
     }
 
     const fromStatus = purchase.status as PurchaseStatus;
+
+    // Bloqueio absoluto após consolidação
+    if (fromStatus === PurchaseStatus.CONSOLIDADO) {
+      throw new ConflictException('Purchase consolidada não pode ser alterada');
+    }
 
     // 2. Validar transição via domínio
     const allowed = canTransition(fromStatus, toStatus, actor);

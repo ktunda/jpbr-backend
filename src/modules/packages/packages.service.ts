@@ -6,12 +6,15 @@ import {
   PACKAGE_STATE_TRANSITIONS,
 } from '../../domain/package/package.state-machine';
 import { PackageStatus } from '../../domain/package/package-status.enum';
+import { PurchasesService } from '../purchases/purchases.service';
+import { PurchaseStatus } from '../../domain/purchase/purchase-status.enum';
 
 @Injectable()
 export class PackagesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly statusHistoryService: StatusHistoryService,
+    private readonly purchasesService: PurchasesService,
   ) {}
 
   /**
@@ -185,7 +188,16 @@ async finishConsolidation(packageId: string) {
     throw new Error('Package não possui purchases vinculadas');
   }
 
-  // 4. Atualizar status do package
+  // 4. Consolidar todas as Purchases vinculadas (via domínio)
+  for (const item of pkg.items) {
+    await this.purchasesService.transitionStatus(
+      item.purchaseId,
+      PurchaseStatus.CONSOLIDADO,
+      'SYSTEM',
+    );
+  }
+
+  // 5. Atualizar status do package
   const updatedPackage = await this.prisma.client.package.update({
     where: { id: packageId },
     data: {
@@ -193,7 +205,7 @@ async finishConsolidation(packageId: string) {
     },
   });
 
-  // 5. Auditoria
+  // 6. Auditoria
   await this.statusHistoryService.record({
     entityType: 'PACKAGE',
     entityId: packageId,
