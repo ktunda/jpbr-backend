@@ -18,24 +18,14 @@ export function calculatePrice(
   const fxRateApplied = fxRateBase * (1 + fxSpread);
 
   // 3. Converter para BRL
-  const baseAmount = totalDeclaredJpy * fxRateApplied;
+  const declaredValueBrl = totalDeclaredJpy * fxRateApplied;
 
   // 3.1 Frete fixo provisório
   const freightAmount = 300;
 
-  // 3.2 Parâmetros do Imposto de Importação (II)
-  const usdExchangeRate = 150; // provisório
-  const importTaxThresholdUsd = 50;
+  // 3.2 Imposto de Importação (II) — sempre calculado
   const importTaxRate = 0.6;
-
-  // 3.3 Converter valor declarado para USD
-  const totalDeclaredUsd = totalDeclaredJpy / usdExchangeRate;
-
-  // 3.4 Calcular Imposto de Importação (II)
-  const importTaxAmount =
-    totalDeclaredUsd > importTaxThresholdUsd
-      ? totalDeclaredUsd * importTaxRate * fxRateApplied
-      : 0;
+  const importTaxAmount = declaredValueBrl * importTaxRate;
 
   return {
     freightAmount,
@@ -43,7 +33,7 @@ export function calculatePrice(
     icmsAmount: 0,
     adminFeeAmount: 0,
     riskBufferAmount: 0,
-    totalAmount: baseAmount + freightAmount + importTaxAmount,
+    totalAmount: declaredValueBrl + freightAmount + importTaxAmount,
     fxRateApplied,
   };
 }
