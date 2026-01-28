@@ -53,7 +53,7 @@ model Package {
 
   user User @relation(fields: [userId], references: [id])
   items PackageItem[]
-
+  quotes Quote[]
 }
 
 model PackageItem {
@@ -64,4 +64,26 @@ model PackageItem {
 
   package Package  @relation(fields: [packageId], references: [id])
   purchase Purchase @relation(fields: [purchaseId], references: [id])
+}
+
+model Quote {
+  id               String   @id @default(uuid())
+  packageId        String
+
+  status           String   @default("ATIVO")
+
+  freightAmount    Float
+  importTaxAmount  Float
+  icmsAmount       Float
+  adminFeeAmount   Float
+  riskBufferAmount Float
+  totalAmount      Float
+
+  currency         String
+  fxRateApplied    Float
+
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  package Package @relation(fields: [packageId], references: [id])
 }

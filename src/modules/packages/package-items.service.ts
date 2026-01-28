@@ -86,4 +86,28 @@ export class PackageItemsService {
 
     return item;
   }
+
+  async listByPackageId(packageId: string) {
+    const items = await this.prisma.client.packageItem.findMany({
+      where: {
+        packageId,
+      },
+      include: {
+        purchase: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    return items.map(item => ({
+      packageItemId: item.id,
+      purchaseId: item.purchaseId,
+      storeName: item.purchase.storeName,
+      declaredValueJpy: item.purchase.declaredValueJpy,
+      status: item.purchase.status,
+      addedAt: item.createdAt,
+    }));
+  }
+
 }

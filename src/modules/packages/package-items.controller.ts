@@ -1,4 +1,4 @@
-import { Controller, Post, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body } from '@nestjs/common';
 import { PackageItemsService } from './package-items.service';
 import { AddPackageItemDto } from './dto/add-package-item.dto';
 
@@ -18,4 +18,12 @@ export class PackageItemsController {
       purchaseId: body.purchaseId,
     });
   }
+
+  @Get(':id/items')
+  async listItems(
+    @Param('id') packageId: string,
+  ) {
+    return this.packageItemsService.listByPackageId(packageId);
+  }
+
 }
