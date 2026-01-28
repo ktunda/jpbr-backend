@@ -1,19 +1,7 @@
-export type PricingInput = {
-  items: {
-    declaredValueJpy: number;
-  }[];
-  destinationState: string;
-};
-
-export type PricingResult = {
-  freightAmount: number;
-  importTaxAmount: number;
-  icmsAmount: number;
-  adminFeeAmount: number;
-  riskBufferAmount: number;
-  totalAmount: number;
-  fxRateApplied: number;
-};
+import {
+  PricingInput,
+  PricingResult,
+} from './pricing.types';
 
 export function calculatePrice(
   input: PricingInput,
@@ -29,12 +17,15 @@ export function calculatePrice(
 
   // 3. Converter para BRL (por enquanto igual)
   const baseAmount = totalDeclaredJpy * fxRateApplied;
+
   // 3.1 Frete fixo provisório
   const freightAmount = 300;
+
   // 3.2 Parâmetros do Imposto de Importação (II)
   const usdExchangeRate = 150; // 1 USD = 150 JPY (provisório)
   const importTaxThresholdUsd = 50;
   const importTaxRate = 0.6; // 60%
+
   // 3.3 Converter valor declarado para USD
   const totalDeclaredUsd = totalDeclaredJpy / usdExchangeRate;
 
@@ -55,5 +46,3 @@ export function calculatePrice(
     fxRateApplied,
   };
 }
-
-
