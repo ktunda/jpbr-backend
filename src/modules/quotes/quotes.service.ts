@@ -54,6 +54,36 @@ export class QuotesService {
       destinationState: params.destinationState,
     });
 
+    // 5.1.1 Montar breakdown financeiro (snapshot)
+    const totalDeclaredJpy = items.reduce(
+      (sum, item) => sum + item.purchase.declaredValueJpy,
+      0,
+    );
+
+    const declaredValueBrl = totalDeclaredJpy * pricing.fxRateApplied;
+
+    const breakdownJson = {
+      declaredValueJpy: totalDeclaredJpy,
+      declaredValueBrl: declaredValueBrl,
+
+      freightAmount: pricing.freightAmount,
+
+      importTax: {
+        rate: 0.6,
+        amount: pricing.importTaxAmount,
+      },
+
+      icms: {
+        state: params.destinationState,
+        amount: pricing.icmsAmount,
+      },
+
+      riskBuffer: {
+        rate: 0.05,
+        amount: pricing.riskBufferAmount,
+      },
+    };
+
     // 5.2 Expirar quotes ativos anteriores (boa prática)
     await this.prisma.client.quote.updateMany({
       where: {
@@ -81,6 +111,9 @@ export class QuotesService {
 
         currency: 'BRL',
         fxRateApplied: pricing.fxRateApplied,
+
+        breakdownJson: breakdownJson,
+        ruleVersion: 'pricing-v1',
 
         expiresAt: new Date(
           Date.now() + 24 * 60 * 60 * 1000,
