@@ -82,6 +82,9 @@ model Quote {
   currency         String
   fxRateApplied    Float
 
+  breakdownJson    Json
+  ruleVersion      String
+
   expiresAt        DateTime
   createdAt        DateTime @default(now())
 
